@@ -9,7 +9,7 @@ import 'package:league_manager/pages/homePage.dart';
 import 'package:league_manager/pages/leaguePage.dart';
 
 class AppData with ChangeNotifier {
-  List<League> myLeagues = [League("name", Mode.LEAGUE, 23, ["1","2","3"], 2, 3, 1, 0), League("aaaaa", Mode.LEAGUE, 23, ["1","2","3"], 2, 3, 1, 0)];
+  List<League> myLeagues = [League("name", Mode.LEAGUE, 23, ["1","2","3"], 2, 3, 1, 0), League("aaaaa", Mode.LEAGUE, 23, ["a","e","u"], 2, 3, 1, 0)];
 
   final TextEditingController controllerName = TextEditingController();
   final ValueNotifier<bool> switchNotifier = ValueNotifier<bool>(false);
@@ -21,6 +21,8 @@ class AppData with ChangeNotifier {
   List<String> creatingTeams = [];
 
   bool canEdit = true;
+
+  int indexLeague = 0;
 
 
   void createLeague(BuildContext context) {
@@ -106,6 +108,13 @@ class AppData with ChangeNotifier {
         );
       },
     );
+  }
+
+  int selectedIndex = 0;
+
+  void onItemTapped(int index) {
+    selectedIndex = index;
+    notifyListeners();
   }
 
   void changeToCreationPage(BuildContext context) {

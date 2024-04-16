@@ -95,7 +95,10 @@ Center _myLeagues(BuildContext context) {
 
 Widget teamList(AppData appData, BuildContext context, int index) {
   return GestureDetector(
-    onTap: () => appData.changeToLeaguePage(context),
+    onTap: () { 
+      appData.indexLeague = index;
+      appData.changeToLeaguePage(context);
+      },
     child: Container(
       height: 40,
       color: Colors.transparent,

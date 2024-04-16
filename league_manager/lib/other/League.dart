@@ -1,8 +1,7 @@
 // ignore_for_file: file_names, prefer_initializing_formals
 
 enum Mode {
-  LEAGUE,
-  TOURNAMENT
+  LEAGUE
 }
 
 class League {
