@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:league_manager/other/Team.dart';
 import 'package:provider/provider.dart';
 import 'package:league_manager/other/AppData.dart';
 
@@ -50,7 +51,7 @@ class CreateTeams extends StatelessWidget {
                 child: Container(
                   height: 30,
                   child: Text(
-                    appData.creatingTeams[index],
+                    appData.creatingTeams[index].name,
                     style: TextStyle(fontSize: 20)
                     ),
                 ),
@@ -85,7 +86,7 @@ class CreateTeams extends StatelessWidget {
               child: Text('ADD'),
               onPressed: () {
                 if (textController.text.isNotEmpty) {
-                  appData.creatingTeams.add(textController.text);
+                  appData.creatingTeams.add(Team(textController.text));
                   appData.notifyListeners();
                 }
                 Navigator.of(context).pop();

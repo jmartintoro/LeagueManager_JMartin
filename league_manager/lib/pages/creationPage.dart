@@ -107,7 +107,8 @@ Widget _createLeague(BuildContext context) {
             ),
           onPressed:() =>  appData.createLeague(context),
           ),
-      )
+      ),
+      const SizedBox(height: 8,)
     ],
   );
 }

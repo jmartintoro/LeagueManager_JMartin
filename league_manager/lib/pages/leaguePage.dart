@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:league_manager/other/AppData.dart';
 
@@ -10,11 +11,6 @@ class LeaguePage extends StatefulWidget {
 }
 
 class _LeaguePageState extends State<LeaguePage> {
-  static final List<Widget> _widgetOptions = <Widget>[
-    _leagueInfo(),
-    _tableView(),
-    _matchday(),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +34,10 @@ class _LeaguePageState extends State<LeaguePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _widgetOptions.elementAt(index),
-              ],
+                if (index == 0) _leagueInfo(context),
+                if (index == 1) _tableView(context), 
+                if (index == 2) _matchday(context)
+              ],  
             ),
           ),
         );
@@ -48,37 +46,111 @@ class _LeaguePageState extends State<LeaguePage> {
   }
 }
 
-Widget _leagueInfo() {
-  return const Center(
+Widget _leagueInfo(BuildContext context) {
+  AppData appData = Provider.of<AppData>(context, listen: false);
+
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.only(left: 2.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            'League Info',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10,),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('League name: ${appData.myLeagues[appData.indexLeague].name}'),
+              const Divider(),
+              Text('Winning Points: ${appData.myLeagues[appData.indexLeague].wPoints}'),
+              const SizedBox(height: 10,),
+              Text('Tie Points: ${appData.myLeagues[appData.indexLeague].tPoints}'),
+              const SizedBox(height: 10,),
+              Text('Lose Points: ${appData.myLeagues[appData.indexLeague].lPoints}'),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _tableView(BuildContext context) {
+  AppData appData = Provider.of<AppData>(context, listen: false);
+  double dataHeight = 30;
+
+  return Center(
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'League info',
+        const Text(
+          'Table',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        DataTable(
+          sortColumnIndex: 1,
+          sortAscending: true,
+          headingRowHeight: dataHeight*1.3,
+          dataRowMaxHeight: dataHeight,
+          dataRowMinHeight: dataHeight,
+          columnSpacing: BorderSide.strokeAlignOutside,
+          columns: const <DataColumn>[
+            DataColumn(
+              label: Text(
+                'Name',
+                style: TextStyle(fontStyle: FontStyle.italic),
+              ),
+            ),
+            DataColumn(
+              label: Text(
+                'Points',
+                style: TextStyle(fontStyle: FontStyle.italic),
+              ),
+              numeric: true,
+            ),
+            DataColumn(
+              label: Text(
+                'Goals',
+                style: TextStyle(fontStyle: FontStyle.italic),
+              ),
+              numeric: true,
+            ),
+            DataColumn(
+              label: Text(
+                'Played',
+                style: TextStyle(fontStyle: FontStyle.italic),
+              ),
+              numeric: true,
+            ),
+          ],
+          rows: appData.myLeagues[appData.indexLeague].teams.map((data) => DataRow(
+            cells: <DataCell>[
+              DataCell(
+                Container(
+                  constraints: BoxConstraints(maxWidth: 150, maxHeight: 20),
+                  child: Text(data.name, overflow: TextOverflow.ellipsis,),
+                ),
+              ), 
+              DataCell(Text(data.points.toString(), style: TextStyle(fontWeight: FontWeight.bold),)), 
+              DataCell(Text("${data.scoredGoals}:${data.concededGoals}")), 
+              DataCell(Text(data.gamesPlayed.toString())), 
+            ],
+          )).toList(),
+        )
       ],
     ),
   );
 }
 
-Widget _tableView() {
-  return const Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Table Page',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ],
-    ),
-  );
-}
+Widget _matchday(BuildContext context) {
+  AppData appData = Provider.of<AppData>(context, listen: false);
 
-Widget _matchday() {
   return const Center(
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -96,7 +168,7 @@ Widget _matchday() {
 CupertinoTabBar _tabBar(BuildContext context) {
   AppData appData = Provider.of<AppData>(context, listen: true);
   return CupertinoTabBar(
-    items: <BottomNavigationBarItem>[
+    items: const <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: Icon(CupertinoIcons.home),
         label: 'League',

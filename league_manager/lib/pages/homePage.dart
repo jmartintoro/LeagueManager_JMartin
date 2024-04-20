@@ -25,15 +25,9 @@ class _HomePageState extends State<HomePage> {
           'League Manager',
           style: TextStyle(fontSize: 25, color: CupertinoColors.black),
         ),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: const Tooltip(
-            message: 'New League',
-            child: Icon(CupertinoIcons.add_circled),
-          ),
-          onPressed: () {
-            appData.changeToCreationPage(context);
-          },
+        trailing: GestureDetector(
+          onTap: () => appData.changeToCreationPage(context),
+          child: Icon(CupertinoIcons.add_circled),
         ),
       ),
       child: SingleChildScrollView(
@@ -111,7 +105,7 @@ Widget teamList(AppData appData, BuildContext context, int index) {
               Text(appData.myLeagues[index].name),
               Padding(
                 padding: const EdgeInsets.only(right: 3),
-                child: Text(appData.creatingTeams.length.toString()),
+                child: Icon(CupertinoIcons.trash, color: CupertinoColors.destructiveRed),
               ),
             ],
           ),

@@ -3,13 +3,14 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:league_manager/other/League.dart';
+import 'package:league_manager/other/Team.dart';
 import 'package:league_manager/pages/creationPage.dart';
 import 'package:league_manager/pages/createTeams.dart';
 import 'package:league_manager/pages/homePage.dart';
 import 'package:league_manager/pages/leaguePage.dart';
 
 class AppData with ChangeNotifier {
-  List<League> myLeagues = [League("name", Mode.LEAGUE, 23, ["1","2","3"], 2, 3, 1, 0), League("aaaaa", Mode.LEAGUE, 23, ["a","e","u"], 2, 3, 1, 0)];
+  List<League> myLeagues = [League("League1", Mode.LEAGUE, 23, [Team("Team 1"),Team("Second Team"),Team("3rd Team"),Team("FC Five"),Team("Team six")], 2, 3, 1, 0), League("League2", Mode.LEAGUE, 23, [Team("A"),Team("E"),Team("I")], 2, 3, 1, 0)];
 
   final TextEditingController controllerName = TextEditingController();
   final ValueNotifier<bool> switchNotifier = ValueNotifier<bool>(false);
@@ -18,7 +19,7 @@ class AppData with ChangeNotifier {
   final TextEditingController tiePointsController = TextEditingController();
   final TextEditingController loosePointsController = TextEditingController();
 
-  List<String> creatingTeams = [];
+  List<Team> creatingTeams = [];
 
   bool canEdit = true;
 
@@ -27,7 +28,7 @@ class AppData with ChangeNotifier {
 
   void createLeague(BuildContext context) {
     canEdit = false;
-    sleep(Duration(seconds: 3));
+    sleep(Duration(seconds: 2));
     addLeague(context);
     canEdit = true;
 
