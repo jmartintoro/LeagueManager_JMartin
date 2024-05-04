@@ -73,7 +73,7 @@ Center _myLeagues(BuildContext context) {
           ),
           const SizedBox(height: 15),
           SizedBox(
-            height: MediaQuery.of(context).size.height-150,
+            height: MediaQuery.of(context).size.height-160,
             child: appData.myLeagues.isEmpty 
               ? const Text("No Leagues") 
               : ListView.builder(

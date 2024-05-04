@@ -109,14 +109,14 @@ Widget _tableView(BuildContext context) {
             ),
             DataColumn(
               label: Text(
-                'Points',
+                'Points ',
                 style: TextStyle(fontStyle: FontStyle.italic),
               ),
               numeric: true,
             ),
             DataColumn(
               label: Text(
-                'Goals',
+                'Goals ',
                 style: TextStyle(fontStyle: FontStyle.italic),
               ),
               numeric: true,
@@ -182,7 +182,6 @@ CupertinoTabBar _tabBar(BuildContext context) {
         label: 'Matchday',
       ),
     ],
-    currentIndex: appData.selectedIndex,
     onTap: (index) => appData.onItemTapped(index),
   );
 }

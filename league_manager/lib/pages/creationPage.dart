@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:league_manager/other/AppData.dart';
 
@@ -82,7 +81,7 @@ Widget _createLeague(BuildContext context) {
       const Divider(),
       _buildSwitchButton('Generate Calendar', appData.switchNotifier, appData),
       Builder(builder:(context) {
-        return appData.switchNotifier.value ? _buildNumericField('Rounds', appData.roundsNumberController, 0, 20, appData) : const SizedBox(height: 50);
+        return appData.switchNotifier.value ? _buildNumericField('Rounds', appData.roundsNumberController, 1, 1, 2, appData) : const SizedBox(height: 50);
       }), 
       const Text(
         'GAME CONFIGURATION',
@@ -93,9 +92,9 @@ Widget _createLeague(BuildContext context) {
         ),
       ),
       const SizedBox(height: 20),
-      _buildNumericField("Points for victory", appData.winPointsController, 0, 9, appData),
-      _buildNumericField("Points for tie", appData.tiePointsController, -9, 9, appData),
-      _buildNumericField("Points for defeat", appData.loosePointsController, -9, 9, appData),
+      _buildNumericField("Points for victory", appData.winPointsController, 0, 0, 9, appData),
+      _buildNumericField("Points for tie", appData.tiePointsController, 0, -9, 9, appData),
+      _buildNumericField("Points for defeat", appData.loosePointsController, 0, -9, 9, appData),
       Center(
         child: CupertinoButton.filled(
           padding: EdgeInsets.all(10),
@@ -140,8 +139,8 @@ Widget _buildTextField(String label, TextEditingController controller, AppData a
   );
 }
 
-
-Widget _buildNumericField(String label, TextEditingController controller, int minNumber, int maxNumber, AppData appData) {
+Widget _buildNumericField(String label, TextEditingController controller, int defaultNum, int minNumber, int maxNumber, AppData appData) {
+  controller.text = defaultNum.toString();
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     crossAxisAlignment: CrossAxisAlignment.center,
@@ -155,12 +154,39 @@ Widget _buildNumericField(String label, TextEditingController controller, int mi
           SizedBox(
             height: 40,
             width: 200,
-            child: CupertinoTextField(
-              placeholder: 'Enter $label',
-              controller: controller,
-              enabled: appData.canEdit,
-              onTapOutside: (p) => comprover(controller.text, controller, minNumber, maxNumber), 
-              onSubmitted: (v) => comprover(controller.text, controller, minNumber, maxNumber)
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () { 
+                    int currentValue = int.parse(controller.text);
+                    if (currentValue > minNumber) {
+                      controller.text = (int.parse(controller.text) - 1).toString();
+                    }
+                  },
+                  child: const Icon(CupertinoIcons.minus_circled),
+                ),
+                const SizedBox(width: 5,),
+                SizedBox(
+                  width: 30,
+                  height: 40,
+                  child: CupertinoTextField(
+                    textAlign: TextAlign.center,
+                    controller: controller,
+                    enabled: false,
+                  ),
+                ),
+                const SizedBox(width: 5,),
+                GestureDetector(
+                  onTap: () { 
+                    int currentValue = int.parse(controller.text);
+                    if (currentValue < maxNumber) {
+                      controller.text = (currentValue + 1).toString();
+                    }
+                  },
+                  child: const Icon(CupertinoIcons.add_circled),
+                ),
+              ],
             ),
           ),
           

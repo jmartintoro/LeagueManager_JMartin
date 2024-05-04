@@ -10,7 +10,7 @@ import 'package:league_manager/pages/homePage.dart';
 import 'package:league_manager/pages/leaguePage.dart';
 
 class AppData with ChangeNotifier {
-  List<League> myLeagues = [League("League1", Mode.LEAGUE, 23, [Team("Team 1"),Team("Second Team"),Team("3rd Team"),Team("FC Five"),Team("Team six")], 2, 3, 1, 0), League("League2", Mode.LEAGUE, 23, [Team("A"),Team("E"),Team("I")], 2, 3, 1, 0)];
+  List<League> myLeagues = [League("League1", Mode.LEAGUE, 6, [Team("Team 1"),Team("Second Team"),Team("3rd Team"),Team("FC Five"),Team("Team six")], 2, 3, 1, 0), League("League2", Mode.LEAGUE, 3, [Team("A"),Team("E"),Team("I")], 2, 3, 1, 0)];
 
   final TextEditingController controllerName = TextEditingController();
   final ValueNotifier<bool> switchNotifier = ValueNotifier<bool>(false);
