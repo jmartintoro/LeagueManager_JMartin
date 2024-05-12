@@ -101,6 +101,8 @@ Widget _tableView(BuildContext context) {
   AppData appData = Provider.of<AppData>(context, listen: false);
   double dataHeight = 30;
 
+  appData.myLeagues[appData.indexLeague].teams.sort((a, b) => b.points.compareTo(a.points));
+
   return Center(
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
