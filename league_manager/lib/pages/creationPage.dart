@@ -22,7 +22,7 @@ class _CreationPageState extends State<CreationPage> {
           style: TextStyle(fontSize: 25, color: CupertinoColors.black),
         ),
       ),
-      child: Center(
+      child: Container(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
@@ -43,7 +43,7 @@ Widget _createLeague(BuildContext context) {
 
 
   return Column(
-    mainAxisAlignment: MainAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.start,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       const SizedBox(height: 20),
@@ -79,10 +79,7 @@ Widget _createLeague(BuildContext context) {
           ),
       ),
       const Divider(),
-      _buildSwitchButton('Generate Calendar', appData.switchNotifier, appData),
-      Builder(builder:(context) {
-        return appData.switchNotifier.value ? _buildNumericField('Rounds', appData.roundsNumberController, 1, 1, 2, appData) : const SizedBox(height: 50);
-      }), 
+      const SizedBox(height: 20,),
       const Text(
         'GAME CONFIGURATION',
         style: TextStyle(
@@ -92,8 +89,8 @@ Widget _createLeague(BuildContext context) {
         ),
       ),
       const SizedBox(height: 20),
-      _buildNumericField("Points for victory", appData.winPointsController, 0, 0, 9, appData),
-      _buildNumericField("Points for tie", appData.tiePointsController, 0, -9, 9, appData),
+      _buildNumericField("Points for victory", appData.winPointsController, 3, 0, 9, appData),
+      _buildNumericField("Points for tie", appData.tiePointsController, 1, -9, 9, appData),
       _buildNumericField("Points for defeat", appData.loosePointsController, 0, -9, 9, appData),
       Center(
         child: CupertinoButton.filled(

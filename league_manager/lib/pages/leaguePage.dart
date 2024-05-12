@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:league_manager/other/Matchday.dart';
+import 'package:league_manager/other/Match.dart';
 import 'package:provider/provider.dart';
 import 'package:league_manager/other/AppData.dart';
 
@@ -14,10 +16,10 @@ class _LeaguePageState extends State<LeaguePage> {
 
   @override
   Widget build(BuildContext context) {
-    AppData appData = Provider.of<AppData>(context, listen: false);
+    AppData appData = Provider.of<AppData>(context, listen: true);
 
     return CupertinoTabScaffold(
-      tabBar: _tabBar(context), // Set the bottom navigation bar
+      tabBar: _tabBar(context),
       tabBuilder: (context, index) {
         return CupertinoPageScaffold(
           backgroundColor: const Color.fromARGB(255, 234, 234, 234),
@@ -27,6 +29,21 @@ class _LeaguePageState extends State<LeaguePage> {
               '${appData.myLeagues[appData.indexLeague].name} Page',
               style: const TextStyle(fontSize: 25, color: CupertinoColors.black),
             ),
+            trailing: 
+              index == 1
+                ? appData.canSave 
+                  ? GestureDetector( 
+                    onTap: () => appData.updateTable(), 
+                    child: const Icon(
+                      CupertinoIcons.refresh_circled, 
+                      color: CupertinoColors.activeBlue,
+                      )
+                    )
+                  : const Icon(
+                      CupertinoIcons.refresh_circled, 
+                      color: CupertinoColors.inactiveGray,
+                      )
+                : null,
           ),
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(5),
@@ -149,19 +166,149 @@ Widget _tableView(BuildContext context) {
 }
 
 Widget _matchday(BuildContext context) {
-  AppData appData = Provider.of<AppData>(context, listen: false);
-
-  return const Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Matchday Page',
-          style: TextStyle(fontWeight: FontWeight.bold),
+  AppData appData = Provider.of<AppData>(context, listen: true);
+  
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+              onTap: () => appData.pageController.animateToPage(
+                appData.pageController.page!.round() - 1, 
+                duration: Durations.medium1, 
+                curve: Curves.linear
+              ), 
+              child: const Icon(CupertinoIcons.minus_circle),
+            ),
+          const SizedBox(width: 24,),
+          const Text('Matchday', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(width: 24,),
+          GestureDetector(
+              onTap: () => appData.pageController.animateToPage(
+                appData.pageController.page!.round() + 1, 
+                duration: Durations.medium1, 
+                curve: Curves.linear
+              ), 
+              child: const Icon(CupertinoIcons.add_circled),
+            ),
+        ],
+      ),
+      const SizedBox(height: 10),
+      Container(
+        height: ((appData.myLeagues[appData.indexLeague].teams.length/2)*150)+60,
+        child: PageView(
+          controller: appData.pageController,
+          scrollDirection: Axis.horizontal,
+          children: <Widget>[
+            for (int i = 0; i < appData.myLeagues[appData.indexLeague].matchdays.length; i++) 
+              _matchdayContent(context, i+1), 
+          ],
         ),
-      ],
-    ),
+      ),
+    ],
+  );
+}
+
+Widget _matchdayContent(BuildContext context, int pageIndex) {
+  AppData appData = Provider.of<AppData>(context, listen: true);
+  Matchday matchday = appData.myLeagues[appData.indexLeague].matchdays[pageIndex-1];
+  
+  return Column(
+    children: [
+      Text(
+        'Matchday $pageIndex',
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      Expanded(
+        child: ListView.builder(
+          itemCount: matchday.matches.length,
+          itemBuilder: (context, index) {
+            Match match = matchday.matches[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    match.homeTeam.name, 
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(width: 10,),
+                  _goalsButton(match, true, new TextEditingController(), appData),
+                  const SizedBox(width: 10,),
+                  const Text(
+                    ' vs ', 
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(width: 10,),
+                  _goalsButton(match, false, new TextEditingController(), appData),
+                  Text(
+                    match.awayTeam.name, 
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            );
+          }
+        )
+      )
+    ]
+  );
+}
+
+Column _goalsButton(Match match, bool isHome, TextEditingController controller, AppData appData) {
+  controller.text = (isHome ? match.homeGoals : match.awayGoals).toString();
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      SizedBox(
+        width: 50,
+        height: 25,
+        child: CupertinoButton(
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(8.0), topRight: Radius.circular(8.0)),
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            int currentValue = int.parse(controller.text);
+            controller.text = (currentValue + 1).toString();
+            isHome ? match.homeGoals++ : match.awayGoals++;
+            isHome ? match.homeTeam.scoredGoals++ : match.awayTeam.scoredGoals++;
+            isHome ? match.awayTeam.concededGoals++ : match.homeTeam.concededGoals++;
+          },
+          color: CupertinoColors.systemBlue,
+          child: const Icon(CupertinoIcons.add, size: 24),
+        )
+      ),
+      SizedBox(
+        width: 50,
+        height: 30,
+        child: CupertinoTextField(
+          textAlign: TextAlign.center,
+          controller: controller,
+          enabled: false,
+        ),
+      ),
+      SizedBox(
+        width: 50,
+        height: 25,
+        child: CupertinoButton(
+          borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8.0), bottomRight: Radius.circular(8.0)),
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            int currentValue = int.parse(controller.text);
+            if (currentValue > 0) {
+              controller.text = (currentValue - 1).toString();
+              isHome ? match.homeGoals-- : match.awayGoals--;
+              isHome ? match.homeTeam.scoredGoals-- : match.awayTeam.scoredGoals--;
+              isHome ? match.awayTeam.concededGoals-- : match.homeTeam.concededGoals--;
+            }
+          },
+          color: CupertinoColors.systemBlue,
+          child: const Icon(CupertinoIcons.minus,size: 24),
+        )
+      ),
+    ],
   );
 }
 

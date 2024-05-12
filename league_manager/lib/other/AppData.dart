@@ -4,40 +4,42 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:league_manager/other/League.dart';
 import 'package:league_manager/other/Team.dart';
+import 'package:league_manager/other/Match.dart';
+import 'package:league_manager/other/Matchday.dart';
+import 'package:league_manager/other/MatchScheduler.dart';
 import 'package:league_manager/pages/creationPage.dart';
 import 'package:league_manager/pages/createTeams.dart';
 import 'package:league_manager/pages/homePage.dart';
 import 'package:league_manager/pages/leaguePage.dart';
 
 class AppData with ChangeNotifier {
-  List<League> myLeagues = [League("League1", Mode.LEAGUE, 6, [Team("Team 1"),Team("Second Team"),Team("3rd Team"),Team("FC Five"),Team("Team six")], 2, 3, 1, 0), League("League2", Mode.LEAGUE, 3, [Team("A"),Team("E"),Team("I")], 2, 3, 1, 0)];
+  
+  List<League> myLeagues = [];
 
   final TextEditingController controllerName = TextEditingController();
-  final ValueNotifier<bool> switchNotifier = ValueNotifier<bool>(false);
-  final TextEditingController roundsNumberController = TextEditingController();
   final TextEditingController winPointsController = TextEditingController();
   final TextEditingController tiePointsController = TextEditingController();
   final TextEditingController loosePointsController = TextEditingController();
 
+  final PageController pageController = PageController(initialPage: 0);
+
   List<Team> creatingTeams = [];
 
   bool canEdit = true;
+  bool canSave = true;
 
   int indexLeague = 0;
 
 
   void createLeague(BuildContext context) {
     canEdit = false;
-    sleep(Duration(seconds: 2));
+    sleep(Duration(seconds: 1));
     addLeague(context);
     canEdit = true;
-
-    // print(myLeagues);
   }
 
   void addLeague(BuildContext context) {
     String name = controllerName.text.trim();
-    int rounds  = 0;
     int wPoints = 0;
     int tPoints = 0;
     int lPoints = 0;
@@ -55,15 +57,6 @@ class AppData with ChangeNotifier {
       return;
     }
 
-    if (switchNotifier.value) {
-      try {
-        rounds = int.parse(roundsNumberController.text);
-      } catch (e) {
-        throwPopup(context, "Rounds is empty");
-        return;
-      }
-    }
-
     try {
       wPoints = int.parse(winPointsController.text);
       tPoints = int.parse(tiePointsController.text);
@@ -72,8 +65,34 @@ class AppData with ChangeNotifier {
       throwPopup(context, "Complete the Game Configuration");
       return;
     }
-    
-    myLeagues.add(League(name, Mode.LEAGUE, creatingTeams.length, creatingTeams, rounds, wPoints, tPoints, lPoints));
+
+    MatchScheduler scheduler = new MatchScheduler();
+
+    // Generate original matchdays
+    List<Matchday> matchdays = scheduler.generateMatchdays(creatingTeams);
+
+    // Generate inverted matchdays with home/away swapped
+    List<Matchday> invertedMatchdays = scheduler.generateInvertedMatchdays(matchdays);
+
+    // Combine the original and inverted matchdays
+    List<Matchday> allMatchdays = [...matchdays, ...invertedMatchdays];
+
+    for (var matchday in allMatchdays) {
+      print("Matchday ${matchday.dayNumber}:");
+      for (var match in matchday.matches) {
+        print(match);
+      }
+      print("");
+    }
+
+    List<Team> teams = List<Team>.from(creatingTeams);
+
+
+    myLeagues.add(League(name, Mode.LEAGUE, teams.length, teams, wPoints, tPoints, lPoints, allMatchdays));
+    print(myLeagues[0]);
+    creatingTeams.clear();
+    controllerName.text = "";
+
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => HomePage()),
@@ -111,11 +130,62 @@ class AppData with ChangeNotifier {
     );
   }
 
+  List<Match> generateMatches(List<Team> teams) {
+    List<Match> matches = [];
+
+    for (int i = 0; i < teams.length; i++) {
+      for (int j = 0; j < teams.length; j++) {
+        if (teams[i] != teams[j]) { // Ensure a team doesn't encounter itself
+        Match match1 = Match(teams[i],teams[j]);
+        Match match2 = Match(teams[j], teams[i]);
+
+        if (!matches.contains(match1) && !matches.contains(match2)) {
+          matches.add(match1); // Add the forward match
+        }
+      }
+      }
+
+    }
+
+    return matches;
+  }
+
   int selectedIndex = 0;
 
   void onItemTapped(int index) {
     selectedIndex = index;
     notifyListeners();
+  }
+
+  void updateTable() {
+    canSave = false;
+    notifyListeners();
+
+    Future.delayed(const Duration(seconds: 1), () {
+      
+      for (int i = 0; i < myLeagues[indexLeague].teamsNum; i++) {
+        myLeagues[indexLeague].teams[i].points = 0;
+      }
+
+      for (Matchday matchday in myLeagues[indexLeague].matchdays) {
+        for (Match match in matchday.matches) {
+          if (match.homeGoals > match.awayGoals) {
+            match.homeTeam.points += myLeagues[indexLeague].wPoints;
+            match.awayTeam.points += myLeagues[indexLeague].lPoints;
+          } else if (match.homeGoals < match.awayGoals) {
+            match.homeTeam.points += myLeagues[indexLeague].lPoints;
+            match.awayTeam.points += myLeagues[indexLeague].wPoints;
+          } else {
+            match.homeTeam.points += myLeagues[indexLeague].tPoints;
+            match.awayTeam.points += myLeagues[indexLeague].tPoints;
+          }
+        }
+      }
+            
+      
+      canSave = true;
+      notifyListeners(); 
+    });
   }
 
   void changeToCreationPage(BuildContext context) {
