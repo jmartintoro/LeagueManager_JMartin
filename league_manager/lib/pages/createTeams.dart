@@ -50,10 +50,22 @@ class CreateTeams extends StatelessWidget {
                 color: CupertinoColors.systemBlue.withOpacity(0.1),
                 child: Container(
                   height: 30,
-                  child: Text(
-                    appData.creatingTeams[index].name,
-                    style: TextStyle(fontSize: 20)
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        appData.creatingTeams[index].name,
+                        style: TextStyle(fontSize: 20)
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            appData.creatingTeams.removeAt(index);
+                            appData.notifyListeners();
+                          },
+                          child: const Icon(CupertinoIcons.trash, color: CupertinoColors.destructiveRed)
+                        ),
+                    ],
+                  ),
                 ),
               );
             },

@@ -105,7 +105,13 @@ Widget teamList(AppData appData, BuildContext context, int index) {
               Text(appData.myLeagues[index].name),
               Padding(
                 padding: const EdgeInsets.only(right: 3),
-                child: Icon(CupertinoIcons.trash, color: CupertinoColors.destructiveRed),
+                child: GestureDetector(
+                  onTap: () {
+                    appData.myLeagues.removeAt(index);
+                    appData.notifyListeners();
+                  },
+                  child: const Icon(CupertinoIcons.trash, color: CupertinoColors.destructiveRed)
+                ),
               ),
             ],
           ),
