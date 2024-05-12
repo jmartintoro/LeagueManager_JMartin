@@ -12,7 +12,24 @@ class Match {
         awayTeam = awayTeam,
         awayGoals = 0;
 
+  Map<String, dynamic> toJson() {
+    return {
+      'homeTeam': homeTeam.toJson(),
+      'homeGoals': homeGoals,
+      'awayTeam': awayTeam.toJson(),
+      'awayGoals': awayGoals,
+    };
+  }
 
+  // fromJson method to convert JSON to Match object
+  factory Match.fromJson(Map<String, dynamic> json) {
+    return Match(
+      Team.fromJson(json['homeTeam']),
+      Team.fromJson(json['awayTeam']),
+    )
+      ..homeGoals = json['homeGoals']
+      ..awayGoals = json['awayGoals'];
+  }
 
   @override
   String toString() {

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -35,6 +36,7 @@ class AppData with ChangeNotifier {
     canEdit = false;
     sleep(Duration(seconds: 1));
     addLeague(context);
+    print(myLeagues);
     canEdit = true;
   }
 
@@ -77,19 +79,11 @@ class AppData with ChangeNotifier {
     // Combine the original and inverted matchdays
     List<Matchday> allMatchdays = [...matchdays, ...invertedMatchdays];
 
-    for (var matchday in allMatchdays) {
-      print("Matchday ${matchday.dayNumber}:");
-      for (var match in matchday.matches) {
-        print(match);
-      }
-      print("");
-    }
-
     List<Team> teams = List<Team>.from(creatingTeams);
 
 
-    myLeagues.add(League(name, Mode.LEAGUE, teams.length, teams, wPoints, tPoints, lPoints, allMatchdays));
-    print(myLeagues[0]);
+    myLeagues.add(League(name: name, mode: Mode.LEAGUE, teamsNum: teams.length, teams: teams, wPoints: wPoints, tPoints: tPoints, lPoints: lPoints, matchdays: allMatchdays));
+
     creatingTeams.clear();
     controllerName.text = "";
 
@@ -186,6 +180,34 @@ class AppData with ChangeNotifier {
       canSave = true;
       notifyListeners(); 
     });
+    saveLeagues();
+  }
+
+  void saveLeagues() {
+    String filePath = "./data/persistence.json";
+    List<League> list = List<League>.of(myLeagues);
+
+    File file = File(filePath);
+
+    String jsonList = jsonEncode(list);
+    file.writeAsStringSync(jsonList);
+  }
+
+  void getLeagues() {
+    String filePath = "./data/persistence.json";
+    File file = File(filePath);
+
+    try {
+      String contents = file.readAsStringSync();
+      List<dynamic> jsonList = jsonDecode(contents); 
+
+      List<League> leagues = jsonList.map((jsonLeague) => League.fromJson(jsonLeague)).toList();
+
+      myLeagues = leagues;
+
+    } catch (e) {
+      print("Error reading file: $e");
+    }
   }
 
   void changeToCreationPage(BuildContext context) {
