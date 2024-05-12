@@ -36,7 +36,6 @@ class AppData with ChangeNotifier {
     canEdit = false;
     sleep(Duration(seconds: 1));
     addLeague(context);
-    print(myLeagues);
     canEdit = true;
   }
 
@@ -180,34 +179,6 @@ class AppData with ChangeNotifier {
       canSave = true;
       notifyListeners(); 
     });
-    saveLeagues();
-  }
-
-  void saveLeagues() {
-    String filePath = "./data/persistence.json";
-    List<League> list = List<League>.of(myLeagues);
-
-    File file = File(filePath);
-
-    String jsonList = jsonEncode(list);
-    file.writeAsStringSync(jsonList);
-  }
-
-  void getLeagues() {
-    String filePath = "./data/persistence.json";
-    File file = File(filePath);
-
-    try {
-      String contents = file.readAsStringSync();
-      List<dynamic> jsonList = jsonDecode(contents); 
-
-      List<League> leagues = jsonList.map((jsonLeague) => League.fromJson(jsonLeague)).toList();
-
-      myLeagues = leagues;
-
-    } catch (e) {
-      print("Error reading file: $e");
-    }
   }
 
   void changeToCreationPage(BuildContext context) {
